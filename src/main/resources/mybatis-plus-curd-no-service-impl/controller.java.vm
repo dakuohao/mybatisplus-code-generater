@@ -1,0 +1,186 @@
+package ${package.Controller};
+
+import org.springframework.validation.annotation.Validated;
+import lombok.extern.slf4j.Slf4j;
+import io.swagger.annotations.*;
+
+import ${package.Entity}.${entity};
+import ${package.ServiceImpl}.${table.serviceImplName};
+import ${superServiceImplClassPackage};
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+//
+import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+//
+
+#if(${restControllerStyle})
+import org.springframework.web.bind.annotation.RestController;
+#else
+import org.springframework.stereotype.Controller;
+#end
+#if(${superControllerClassPackage})
+import ${superControllerClassPackage};
+#end
+
+/**
+ * <p>
+ * $!{table.comment} 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Slf4j
+@Validated
+@Api(tags = "$!{table.comment}接口")
+#if(${restControllerStyle})
+@RestController
+#else
+@Controller
+#end
+@RequestMapping("/api/v1#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
+#if(${kotlin})
+class ${table.controllerName}#if(${superControllerClass}) : ${superControllerClass}()#end
+
+#else
+#if(${superControllerClass})
+public class ${table.controllerName} extends ${superControllerClass} {
+#else
+public class ${table.controllerName} {
+#end
+    @Autowired
+    private ${table.serviceImplName} service;
+
+    
+    @ApiOperation("添加")
+    @PostMapping("/add")
+    public R<Boolean> add(@RequestBody @Validated ${entity} to) {
+        service.save(to);
+        return R.ok();
+    }
+    
+    @ApiOperation("批量添加")
+    @PostMapping("/batchAdd")
+    public R<Boolean> batchAdd(@RequestBody @Validated Collection<${entity}> list) {
+        service.saveBatch(list);
+        return R.ok();
+    }
+    
+    @ApiOperation(value = "添加或修改", notes = "主键不存在则添加，否则修改")
+    @PostMapping("/addOrUpdate")
+    public R<Boolean> addOrUpdate(@RequestBody @Validated ${entity} to) {
+        service.saveOrUpdate(to);
+        //        service.saveOrUpdate(entity,new QueryWrapper<>());//条件更新示例
+        return R.ok();
+    }
+    
+    @ApiOperation(value = "批量添加或修改", notes = "主键不存在则添加，否则修改")
+    @PostMapping("/batchAddOrUpdate")
+    public R<Boolean> batchAddOrUpdate(@RequestBody @Validated Collection<${entity}> list) {
+        service.saveOrUpdateBatch(list);
+        return R.ok();
+    }
+    
+    @ApiOperation(value = "条件删除", notes = "不为空的属性将作为删除条件")
+    @PostMapping("/remove")
+    public R<Boolean> remove(@RequestBody @Validated ${entity} to) {
+        service.removeByMap(BeanUtil.beanToMap(to));
+        // 条件删除示例
+        //        service.remove(new QueryWrapper<>());
+        return R.ok();
+    }
+    
+    @ApiOperation("根据id删除")
+    @DeleteMapping("/removeById/{id}")
+    public R<Boolean> removeById(@PathVariable Serializable id) {
+        service.removeById(id);
+        return R.ok();
+    }
+    
+    @ApiOperation("根据id批量删除")
+    @PostMapping("/removeByIds")
+    public R<Boolean> removeByIds(@RequestBody  @NotNull @Size(min = 1)  Collection<? extends Serializable> ids) {
+        service.removeByIds(ids);
+        return R.ok();
+    }
+
+    @ApiOperation(value = "根据id修改",notes = "根据id修改，除id外，其他字段传值则修改，不传值的字段会被忽略")
+    @PutMapping("/updateById")
+    public R<Boolean> updateById(@RequestBody @Validated ${entity} to) {
+        service.updateById(to);
+        // 条件更新示例
+        //        service.update(entity,new LambdaQueryWrapper<>()
+        //                .eq(Objects.isNull(entity::getName),entity::getName,entity.getName())
+        //        );
+        return R.ok();
+    }
+    
+    @ApiOperation(value = "根据id批量更新",notes = "根据id修改，除id外，其他字段传值则修改，不传值的字段会被忽略")
+    @PutMapping("/batchUpdateById")
+    public R<Boolean> batchUpdateById(@RequestBody Collection<${entity}> to) {
+        service.updateBatchById(to);
+        return R.ok();
+    }
+    
+    @ApiOperation("根据id查询")
+    @GetMapping("/getById/{id}")
+    public R<${entity}> getById(@PathVariable Serializable id) {
+        ${entity} entity = service.getById(id);
+        return R.ok(entity);
+    }
+    
+    @ApiOperation("查询总数")
+    @GetMapping("/count")
+    public R<Integer> count() {
+        int count = service.count();
+        return R.ok(count);
+    }
+    
+    @ApiOperation("查询全部")
+    @GetMapping("/getAll")
+    public R<List<${entity}>> getAll() {
+        List<${entity}> list = service.list();
+        return R.ok(list);
+    }
+    
+    @ApiOperation("分页查询")
+    @PostMapping("/page")
+    public R<PageResult<${entity}>> page(@RequestBody @Validated PageQuery<${entity}> pageQuery) {
+        //有条件分页查询：https://baomidou.com/guide/interceptor-pagination.html#paginationinnerinterceptor
+        //${entity}PageQueryTO params = pageQuery.getParams();
+        //IPage<${entity}> iPage = service.page(pageQuery.getPage(),
+        //new LambdaQueryWrapper<${entity}>()
+        //.eq(StrUtil.isNotBlank(params.getId()), ${entity}::getId, params.getId())
+        //.like(StrUtil.isNotBlank(params.getName()), ${entity}::getName, params.getPhone())
+        //);
+        
+        //无条件分页示例
+        IPage<${entity}> iPage = service.page(pageQuery.getPage());
+        //return R.ok(PageResult.page(iPage));
+        return R.ok(iPage);
+    }
+
+
+
+}
+
+#end

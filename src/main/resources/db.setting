@@ -1,0 +1,22 @@
+## 可选配置
+# 是否在日志中显示执行的SQL
+showSql = true
+# 是否格式化显示的SQL
+formatSql = false
+# 是否显示SQL参数
+showParams = true
+
+
+## db.setting文件
+[bbbb]
+url = jdbc:mysql://rm-m5e4k5x228a37k82v.mysql.rds.aliyuncs.com:3310/bbbb?useAffectedRows=true&useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
+user = xxx
+pass = xxx
+
+
+
+[aaa]
+url = jdbc:mysql://rm-m5e4k5x228a37k82v.mysql.rds.aliyuncs.com:3310/aaa?useAffectedRows=true&useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
+user = xxx
+pass = xxx
+
